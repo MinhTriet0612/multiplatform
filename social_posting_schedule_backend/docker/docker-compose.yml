@@ -1,0 +1,42 @@
+
+services:
+  postgres:
+    container_name: social_posting-postgres
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_USER: social_posting_admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: social_posting-db
+    volumes:
+      - social_posting-data:/var/lib/postgresql/data
+    networks:
+      - social_posting-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: social_posting-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./servers.json:/pgadmin4/servers.json
+    networks:
+      - social_posting-network
+
+networks:
+  social_posting-network:
+
+volumes:
+  social_posting-data:
+  pgadmin-data:
+

@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Social Posting - Postgres",
+      "Group": "Servers",
+      "Host": "social_posting-postgres",
+      "Port": 5432,
+      "MaintenanceDB": "social_posting-db",
+      "Username": "social_posting_admin",
+      "SSLMode": "prefer"
+    }
+  }
+}
