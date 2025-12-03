@@ -1,12 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsArray, IsOptional, IsEnum, IsDateString, ArrayMaxSize, MaxLength } from 'class-validator';
+import { IsString, IsArray, IsOptional, IsEnum, ArrayMaxSize, MaxLength, IsBoolean, IsUrl } from 'class-validator';
 
 export enum InstagramMediaType {
-  IMAGE = 'IMAGE',
-  VIDEO = 'VIDEO',
+  CAROUSEL = 'CAROUSEL',
   REELS = 'REELS',
   STORIES = 'STORIES',
-  CAROUSEL = 'CAROUSEL',
 }
 
 export class CreateInstagramPostDto {
@@ -31,12 +29,44 @@ export class CreateInstagramPostDto {
   mediaUrls: string[];
 
   @ApiPropertyOptional({
-    description: 'Media type. Auto-detected if not provided',
+    description: 'Media type: CAROUSEL (images only), REELS (video), or STORIES (video)',
     enum: InstagramMediaType,
-    example: InstagramMediaType.IMAGE,
+    example: InstagramMediaType.CAROUSEL,
   })
   @IsOptional()
   @IsEnum(InstagramMediaType)
   mediaType?: InstagramMediaType;
+
+  @ApiPropertyOptional({
+    description: 'Group ID (campaign ID) to associate this post with',
+    example: 'clx1234567890',
+  })
+  @IsOptional()
+  @IsString()
+  groupId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Cover image URL for Reels (required for Reels)',
+    example: 'https://cdn.example.com/cover.jpg',
+  })
+  @IsOptional()
+  @IsUrl()
+  coverUrl?: string;
+
+  @ApiPropertyOptional({
+    description: 'For Reels: whether to share to main feed (default: true)',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  shareToFeed?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Instagram location ID for location tagging',
+    example: '213385402',
+  })
+  @IsOptional()
+  @IsString()
+  locationId?: string;
 }
 

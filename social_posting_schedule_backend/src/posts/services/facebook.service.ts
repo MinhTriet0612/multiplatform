@@ -19,6 +19,7 @@ export class FacebookService {
     const post = await this.prisma.facebookPost.create({
       data: {
         userId,
+        groupId: dto.groupId,
         content: dto.content,
         mediaUrl: dto.mediaUrl,
         mediaType,
@@ -55,6 +56,61 @@ export class FacebookService {
         where: { id: post.id },
         data: {
           status: FacebookPostStatus.FAILED,
+          responseMessage: message,
+        },
+      });
+    }
+  }
+
+  async repost(id: string, userId: string, dto: CreateFacebookPostDto) {
+    const scheduledAt = dto.scheduledAt ? new Date(dto.scheduledAt) : undefined;
+    const published = !scheduledAt;
+
+    const existing = await this.prisma.facebookPost.findFirst({
+      where: { id, userId },
+    });
+    if (!existing) return null;
+
+    const mediaType = dto.mediaType || this.detectMediaType(dto.mediaUrl ?? existing.mediaUrl ?? undefined);
+
+    try {
+      const result = await this.facebookPublisher.publish({
+        content: dto.content,
+        mediaUrls: dto.mediaUrl ? [dto.mediaUrl] : existing.mediaUrl ? [existing.mediaUrl] : undefined,
+        mediaType: this.mapMediaType(mediaType),
+        published,
+        scheduledAt,
+      });
+
+      const status = published
+        ? FacebookPostStatus.PUBLISHED
+        : FacebookPostStatus.SCHEDULED;
+
+      return this.prisma.facebookPost.update({
+        where: { id: existing.id },
+        data: {
+          content: dto.content,
+          mediaUrl: dto.mediaUrl ?? existing.mediaUrl,
+          mediaType,
+          groupId: dto.groupId ?? existing.groupId,
+          status,
+          externalId: result.externalId,
+          scheduledAt,
+          publishedAt: published ? new Date() : undefined,
+          responseMessage: result.detail,
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to publish';
+      return this.prisma.facebookPost.update({
+        where: { id: existing.id },
+        data: {
+          content: dto.content,
+          mediaUrl: dto.mediaUrl ?? existing.mediaUrl,
+          mediaType,
+          groupId: dto.groupId ?? existing.groupId,
+          status: FacebookPostStatus.FAILED,
+          scheduledAt,
           responseMessage: message,
         },
       });

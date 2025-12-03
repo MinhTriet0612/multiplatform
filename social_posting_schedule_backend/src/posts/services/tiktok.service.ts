@@ -17,6 +17,7 @@ export class TikTokService {
     const post = await this.prisma.tikTokPost.create({
       data: {
         userId,
+        groupId: dto.groupId,
         content: dto.content,
         videoUrl: dto.videoUrl,
         title: dto.title,
@@ -46,6 +47,51 @@ export class TikTokService {
         where: { id: post.id },
         data: {
           status: TikTokPostStatus.FAILED,
+          responseMessage: message,
+        },
+      });
+    }
+  }
+
+  async repost(id: string, userId: string, dto: CreateTikTokPostDto) {
+    const scheduledAt = dto.scheduledAt ? new Date(dto.scheduledAt) : undefined;
+
+    const existing = await this.prisma.tikTokPost.findFirst({
+      where: { id, userId },
+    });
+    if (!existing) return null;
+
+    try {
+      const result = await this.tiktokPublisher.publish({
+        content: dto.content,
+        mediaUrls: [dto.videoUrl],
+      });
+
+      return this.prisma.tikTokPost.update({
+        where: { id: existing.id },
+        data: {
+          content: dto.content,
+          videoUrl: dto.videoUrl,
+          title: dto.title ?? existing.title,
+          groupId: dto.groupId ?? existing.groupId,
+          status: TikTokPostStatus.PUBLISHED,
+          externalId: result.externalId,
+          scheduledAt,
+          publishedAt: new Date(),
+          responseMessage: result.detail,
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to publish';
+      return this.prisma.tikTokPost.update({
+        where: { id: existing.id },
+        data: {
+          content: dto.content,
+          videoUrl: dto.videoUrl,
+          title: dto.title ?? existing.title,
+          groupId: dto.groupId ?? existing.groupId,
+          status: TikTokPostStatus.FAILED,
+          scheduledAt,
           responseMessage: message,
         },
       });

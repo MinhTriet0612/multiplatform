@@ -45,6 +45,22 @@ export class FacebookController {
     return this.facebookService.upload(req.user.userId, dto);
   }
 
+  @Post(':id/repost')
+  @ApiOperation({
+    summary: 'Update and repost an existing Facebook post',
+    description: 'Update content/media of an existing Facebook post and publish again without creating a new record.',
+  })
+  async repost(
+    @Param('id') id: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: CreateFacebookPostDto,
+  ) {
+    if (!req.user?.userId) {
+      throw new UnauthorizedException('Missing user context');
+    }
+    return this.facebookService.repost(id, req.user.userId, dto);
+  }
+
   @Get()
   @ApiOperation({
     summary: 'Get all Facebook posts',

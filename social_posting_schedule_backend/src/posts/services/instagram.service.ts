@@ -9,15 +9,16 @@ export class InstagramService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly instagramPublisher: InstagramPublisher,
-  ) {}
+  ) { }
 
   async upload(userId: string, dto: CreateInstagramPostDto) {
-    const isCarousel = dto.mediaUrls.length > 1;
-    const mediaType = dto.mediaType || (isCarousel ? InstagramMediaType.CAROUSEL : InstagramMediaType.IMAGE);
+    // Default to CAROUSEL if not specified
+    const mediaType = dto.mediaType || InstagramMediaType.CAROUSEL;
 
     const post = await this.prisma.instagramPost.create({
       data: {
         userId,
+        groupId: dto.groupId,
         content: dto.content,
         mediaUrls: dto.mediaUrls,
         mediaType,
@@ -31,6 +32,9 @@ export class InstagramService {
         mediaUrls: dto.mediaUrls,
         mediaType: this.mapMediaType(mediaType),
         published: true,
+        coverUrl: dto.coverUrl,
+        shareToFeed: dto.shareToFeed,
+        locationId: dto.locationId,
       });
 
       return this.prisma.instagramPost.update({
@@ -47,6 +51,62 @@ export class InstagramService {
       return this.prisma.instagramPost.update({
         where: { id: post.id },
         data: {
+          status: InstagramPostStatus.FAILED,
+          responseMessage: message,
+        },
+      });
+    }
+  }
+
+  async repost(id: string, userId: string, dto: CreateInstagramPostDto) {
+    const existing = await this.prisma.instagramPost.findFirst({
+      where: { id, userId },
+    });
+    if (!existing) return null;
+
+    // Default to CAROUSEL if not specified
+    const mediaType = dto.mediaType || InstagramMediaType.CAROUSEL;
+
+    console.log('Reposting Instagram post:', {
+      id,
+      userId,
+      dto,
+      mediaType,
+    })
+
+    try {
+      const result = await this.instagramPublisher.publish({
+        content: dto.content,
+        mediaUrls: dto.mediaUrls,
+        mediaType: this.mapMediaType(mediaType),
+        published: true,
+        coverUrl: dto.coverUrl,
+        shareToFeed: dto.shareToFeed,
+        locationId: dto.locationId,
+      });
+
+      return this.prisma.instagramPost.update({
+        where: { id: existing.id },
+        data: {
+          content: dto.content,
+          mediaUrls: dto.mediaUrls,
+          mediaType,
+          groupId: dto.groupId ?? existing.groupId,
+          status: InstagramPostStatus.PUBLISHED,
+          externalId: result.externalId,
+          publishedAt: new Date(),
+          responseMessage: result.detail,
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to publish';
+      return this.prisma.instagramPost.update({
+        where: { id: existing.id },
+        data: {
+          content: dto.content,
+          mediaUrls: dto.mediaUrls,
+          mediaType,
+          groupId: dto.groupId ?? existing.groupId,
           status: InstagramPostStatus.FAILED,
           responseMessage: message,
         },

@@ -45,6 +45,22 @@ export class TikTokController {
     return this.tiktokService.upload(req.user.userId, dto);
   }
 
+  @Post(':id/repost')
+  @ApiOperation({
+    summary: 'Update and repost an existing TikTok post',
+    description: 'Update description/video of an existing TikTok post and publish again without creating a new record.',
+  })
+  async repost(
+    @Param('id') id: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: CreateTikTokPostDto,
+  ) {
+    if (!req.user?.userId) {
+      throw new UnauthorizedException('Missing user context');
+    }
+    return this.tiktokService.repost(id, req.user.userId, dto);
+  }
+
   @Get()
   @ApiOperation({
     summary: 'Get all TikTok posts',

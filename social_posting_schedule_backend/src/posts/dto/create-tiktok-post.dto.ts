@@ -35,5 +35,13 @@ export class CreateTikTokPostDto {
   @IsOptional()
   @IsDateString()
   scheduledAt?: string;
+
+  @ApiPropertyOptional({
+    description: 'Group ID (campaign ID) to associate this post with',
+    example: 'clx1234567890',
+  })
+  @IsOptional()
+  @IsString()
+  groupId?: string;
 }
 
