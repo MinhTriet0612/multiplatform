@@ -3,7 +3,11 @@ import api from './api';
 export interface CreateInstagramPostPayload {
   content: string;
   mediaUrls: string[];
-  mediaType?: 'IMAGE' | 'VIDEO' | 'REELS' | 'STORIES' | 'CAROUSEL';
+  mediaType?: 'CAROUSEL' | 'REELS' | 'STORIES';
+  groupId?: string;
+  coverUrl?: string;
+  shareToFeed?: boolean;
+  locationId?: string;
 }
 
 export interface InstagramPost {
@@ -27,4 +31,7 @@ export const getInstagramPosts = () =>
 
 export const getInstagramPostById = (id: string) =>
   api.get<InstagramPost>(`/posts/instagram/${id}`);
+
+export const repostInstagramPost = (id: string, payload: CreateInstagramPostPayload) =>
+  api.post<InstagramPost>(`/posts/instagram/${id}/repost`, payload);
 

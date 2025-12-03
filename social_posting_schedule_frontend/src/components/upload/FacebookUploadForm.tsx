@@ -1,11 +1,13 @@
 
 import React, { FormEvent, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { uploadFacebookPost, CreateFacebookPostPayload, getFacebookPostById } from '../../services/facebook';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { uploadFacebookPost, CreateFacebookPostPayload, getFacebookPostById, repostFacebookPost } from '../../services/facebook';
 
 export default function FacebookUploadForm() {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get('groupId') || undefined;
   const [content, setContent] = useState('');
   const [mediaUrl, setMediaUrl] = useState('');
   const [mediaType, setMediaType] = useState<'TEXT' | 'PHOTO' | 'VIDEO'>('TEXT');
@@ -51,9 +53,14 @@ export default function FacebookUploadForm() {
         mediaType: mediaType === 'TEXT' ? undefined : mediaType,
         mediaUrl: mediaUrl || undefined,
         scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
+        groupId,
       };
 
-      await uploadFacebookPost(payload);
+      if (id) {
+        await repostFacebookPost(id, payload);
+      } else {
+        await uploadFacebookPost(payload);
+      }
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload post');

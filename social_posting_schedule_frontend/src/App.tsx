@@ -9,6 +9,8 @@ import InstagramUploadForm from './components/upload/InstagramUploadForm';
 import TikTokUploadForm from './components/upload/TikTokUploadForm';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import GroupCreate from './components/GroupCreate';
+import GroupDetail from './components/GroupDetail';
 
 function App() {
   return (
@@ -23,6 +25,26 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Homepage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/groups/new"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <GroupCreate />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/groups/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <GroupDetail />
                 </Layout>
               </ProtectedRoute>
             }

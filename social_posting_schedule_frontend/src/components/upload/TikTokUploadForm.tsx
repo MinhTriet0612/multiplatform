@@ -1,10 +1,12 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { uploadTikTokPost, CreateTikTokPostPayload, getTikTokPostById } from '../../services/tiktok';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { uploadTikTokPost, CreateTikTokPostPayload, getTikTokPostById, repostTikTokPost } from '../../services/tiktok';
 
 export default function TikTokUploadForm() {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get('groupId') || undefined;
   const [content, setContent] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [title, setTitle] = useState('');
@@ -50,9 +52,14 @@ export default function TikTokUploadForm() {
         videoUrl,
         title: title || undefined,
         scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
+        groupId,
       };
 
-      await uploadTikTokPost(payload);
+      if (id) {
+        await repostTikTokPost(id, payload);
+      } else {
+        await uploadTikTokPost(payload);
+      }
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload post');

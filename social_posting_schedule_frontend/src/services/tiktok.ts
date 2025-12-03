@@ -5,6 +5,7 @@ export interface CreateTikTokPostPayload {
   videoUrl: string;
   title?: string;
   scheduledAt?: string;
+  groupId?: string;
 }
 
 export interface TikTokPost {
@@ -29,4 +30,7 @@ export const getTikTokPosts = () =>
 
 export const getTikTokPostById = (id: string) =>
   api.get<TikTokPost>(`/posts/tiktok/${id}`);
+
+export const repostTikTokPost = (id: string, payload: CreateTikTokPostPayload) =>
+  api.post<TikTokPost>(`/posts/tiktok/${id}/repost`, payload);
 

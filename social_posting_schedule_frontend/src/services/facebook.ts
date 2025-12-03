@@ -5,6 +5,7 @@ export interface CreateFacebookPostPayload {
   mediaUrl?: string;
   mediaType?: 'TEXT' | 'PHOTO' | 'VIDEO';
   scheduledAt?: string;
+  groupId?: string;
 }
 
 export interface FacebookPost {
@@ -28,4 +29,7 @@ export const getFacebookPosts = () =>
 
 export const getFacebookPostById = (id: string) =>
   api.get<FacebookPost>(`/posts/facebook/${id}`);
+
+export const repostFacebookPost = (id: string, payload: CreateFacebookPostPayload) =>
+  api.post<FacebookPost>(`/posts/facebook/${id}/repost`, payload);
 
