@@ -16,6 +16,7 @@ export default function InstagramUploadForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -81,9 +82,28 @@ export default function InstagramUploadForm() {
   };
 
   const removeMediaUrl = (index: number) => {
+    setErrors((prevErrors) => prevErrors.filter((_, i) => i !== index));
+
     if (mediaUrls.length > 1) {
       setMediaUrls(mediaUrls.filter((_, i) => i !== index));
     }
+  };
+
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const newUrls = [...mediaUrls];
+    const updatedUrl = e.target.value;
+    const newErrors = [...errors];
+
+    if (newUrls.includes(updatedUrl) && newUrls[index] !== updatedUrl) {
+      newErrors[index] = 'This URL is already added.';
+    } else {
+      newErrors[index] = '';
+      newUrls[index] = updatedUrl;
+      setMediaUrls(newUrls);
+    }
+
+    setErrors(newErrors);
   };
 
   return (
@@ -131,27 +151,29 @@ export default function InstagramUploadForm() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Media URLs</label>
               {mediaUrls.map((url, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="url"
-                    value={url}
-                    onChange={(e) => {
-                      const newUrls = [...mediaUrls];
-                      newUrls[index] = e.target.value;
-                      setMediaUrls(newUrls);
-                    }}
-                    required={index === 0}
-                    className="flex-1 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    placeholder="https://..."
-                  />
-                  {mediaUrls.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeMediaUrl(index)}
-                      className="px-3 py-2 text-sm text-red-600 hover:text-red-700"
-                    >
-                      Remove
-                    </button>
+                <div>
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="url"
+                      value={url}
+                      onChange={(e) => handleInputChange(e, index)}
+                      required={index === 0}
+                      className="flex-1 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 block"
+                      placeholder="https://..."
+                    />
+
+                    {mediaUrls.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeMediaUrl(index)}
+                        className="px-3 py-2 text-sm text-red-600 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  {errors[index] && (
+                    <div className="error-message text-red-500 text-sm mt-1 flex justify-center">{errors[index]}</div>
                   )}
                 </div>
               ))}
