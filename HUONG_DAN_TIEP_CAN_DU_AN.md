@@ -1074,6 +1074,10 @@ Frontend cập nhật UI
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Docker Documentation](https://docs.docker.com/)
 - [Vite Documentation](https://vitejs.dev/)
+- [Cách dùng useState, useEffect](https://chatgpt.com/share/693370c4-c5ec-8001-b8de-89dcd389b220)
+- [Miro Board](https://miro.com/app/board/uXjVGf_rlHY=/?share_link_id=725340047974)
+
+
 
 ---
 
@@ -1114,6 +1118,9 @@ Sau khi hiểu cấu trúc dự án, bạn có thể:
 5. **Thêm tính năng**: Bắt đầu với các tính năng nhỏ
 
 ---
+
+
+
 
 **Chúc bạn học tập vui vẻ! 🚀**
 
