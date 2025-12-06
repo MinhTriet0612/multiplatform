@@ -134,26 +134,26 @@ export class InstagramPublisher extends PlatformPublisher {
       containerIds.map((id) => this.waitForContainerReady(id)),
     );
 
-    // Step 3: If multiple items, create carousel container, otherwise publish single item
-    if (isCarouselItem) {
-      const carouselContainerId = await this.createCarouselContainer(
-        containerIds,
-        payload.content,
-        payload.locationId,
-      );
-      const mediaId = await this.publishContainer(carouselContainerId);
-      return {
-        externalId: mediaId,
-        detail: 'Instagram carousel published successfully',
-      };
-    } else {
-      // Single item carousel - publish directly
+    // Step 3: Single item carousel - publish directly
+    if (!isCarouselItem) {
       const mediaId = await this.publishContainer(containerIds[0]);
       return {
         externalId: mediaId,
         detail: 'Instagram post published successfully',
       };
     }
+
+    //If multiple items, create carousel container, otherwise publish single item
+    const carouselContainerId = await this.createCarouselContainer(
+      containerIds,
+      payload.content,
+      payload.locationId,
+    );
+    const mediaId = await this.publishContainer(carouselContainerId);
+    return {
+      externalId: mediaId,
+      detail: 'Instagram carousel published successfully',
+    };
   }
 
   private async createCarouselItemContainer(
@@ -330,6 +330,8 @@ export class InstagramPublisher extends PlatformPublisher {
     });
 
     if (!response.ok) {
+      console.log('Publish container response not ok:', response.json().then(data => console.log(data)));
+
       const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
       const errorMessage = error.error?.message || error.message || JSON.stringify(error);
       this.logger.error(`Failed to publish container: ${errorMessage}`);
