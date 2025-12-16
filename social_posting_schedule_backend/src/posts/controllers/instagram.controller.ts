@@ -84,5 +84,17 @@ export class InstagramController {
     }
     return this.instagramService.findOne(id, req.user.userId);
   }
+
+  @Get(':id/insights')
+  @ApiOperation({
+    summary: 'Get insights for an Instagram post',
+    description: 'Fetch Instagram Insights metrics (engagement, impressions, reach) from Facebook Graph API for a specific post.',
+  })
+  async getInsights(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    if (!req.user?.userId) {
+      throw new UnauthorizedException('Missing user context');
+    }
+    return this.instagramService.getInsights(id, req.user.userId);
+  }
 }
 

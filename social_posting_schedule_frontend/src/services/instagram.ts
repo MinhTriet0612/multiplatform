@@ -16,11 +16,30 @@ export interface InstagramPost {
   mediaUrls: string[];
   mediaType: string;
   status: string;
+  groupId?: string;
   externalId?: string;
   containerId?: string;
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface InstagramInsightValue {
+  value: number;
+  end_time?: string;
+}
+
+export interface InstagramInsightMetric {
+  name: string;
+  period: string;
+  values: InstagramInsightValue[];
+  title: string;
+  description: string;
+  id: string;
+}
+
+export interface InstagramInsightsResponse {
+  data: InstagramInsightMetric[];
 }
 
 export const uploadInstagramPost = (payload: CreateInstagramPostPayload) =>
@@ -34,4 +53,7 @@ export const getInstagramPostById = (id: string) =>
 
 export const repostInstagramPost = (id: string, payload: CreateInstagramPostPayload) =>
   api.post<InstagramPost>(`/posts/instagram/${id}/repost`, payload);
+
+export const getInstagramPostInsights = (id: string) =>
+  api.get<InstagramInsightsResponse>(`/posts/instagram/${id}/insights`);
 

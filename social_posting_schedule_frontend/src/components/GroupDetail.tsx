@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { getGroup, GroupWithPosts } from '../services/groups';
+import { getGroup, type GroupWithPosts } from '../services/groups';
 
 export default function GroupDetail() {
   const { id } = useParams<{ id: string }>();
@@ -51,6 +51,10 @@ export default function GroupDetail() {
           ? '/upload/instagram'
           : '/upload/tiktok';
     navigate(`${base}?groupId=${group.id}`);
+  };
+
+  const handleViewInsights = (postId: string) => {
+    navigate(`/instagram-posts/${postId}`);
   };
 
   if (!id) {
@@ -179,13 +183,20 @@ export default function GroupDetail() {
                     Status: {post.status} •{' '}
                     {new Date(post.createdAt).toLocaleString()}
                   </p>
-                  <div className="mt-2">
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={() => handleReusePost('instagram', post.id)}
                       className="text-xs font-medium text-pink-600 hover:text-pink-700"
                     >
                       {post.status === 'FAILED' ? 'Repost' : 'Update & Repost'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleViewInsights(post.id)}
+                      className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+                    >
+                      View Details & Insights
                     </button>
                   </div>
                 </li>

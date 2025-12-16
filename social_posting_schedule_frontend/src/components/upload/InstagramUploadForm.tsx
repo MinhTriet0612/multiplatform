@@ -1,6 +1,6 @@
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { type FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { uploadInstagramPost, CreateInstagramPostPayload, getInstagramPostById, repostInstagramPost } from '../../services/instagram';
+import { uploadInstagramPost, type CreateInstagramPostPayload, getInstagramPostById, repostInstagramPost } from '../../services/instagram';
 
 export default function InstagramUploadForm() {
   const navigate = useNavigate();

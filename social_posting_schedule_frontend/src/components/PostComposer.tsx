@@ -1,5 +1,5 @@
-import React, { FormEvent, useMemo, useState } from 'react';
-import { Platform, uploadUnifiedPost } from '../services/posts';
+import { type FormEvent, useMemo, useState } from 'react';
+import { type Platform, uploadUnifiedPost } from '../services/posts';
 
 const PLATFORM_LABELS: Record<Platform, string> = {
   FACEBOOK: 'Facebook',

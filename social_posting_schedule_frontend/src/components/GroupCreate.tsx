@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGroup } from '../services/groups';
 

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getGroups, Group } from '../services/groups';
+import { getGroups, type Group } from '../services/groups';
 
 export default function Homepage() {
   const [groups, setGroups] = useState<Group[]>([]);

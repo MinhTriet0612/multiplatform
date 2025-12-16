@@ -3,12 +3,14 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateInstagramPostDto, InstagramMediaType } from '../dto/create-instagram-post.dto';
 import { InstagramPublisher } from '../platforms/instagram.publisher';
 import { InstagramPostStatus } from '@prisma/client';
+import { SocialPlatformConfig } from '../config/social-platform.config';
 
 @Injectable()
 export class InstagramService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly instagramPublisher: InstagramPublisher,
+    private readonly config: SocialPlatformConfig,
   ) { }
 
   async upload(userId: string, dto: CreateInstagramPostDto) {
@@ -125,6 +127,39 @@ export class InstagramService {
     return this.prisma.instagramPost.findFirst({
       where: { id, userId },
     });
+  }
+
+  async getInsights(id: string, userId: string) {
+    const post = await this.prisma.instagramPost.findFirst({
+      where: { id, userId },
+    });
+
+    if (!post || !post.externalId) {
+      return null;
+    }
+
+    const url = `${this.config.instagramGraphUrl}/${post.externalId}/insights`;
+    // Note:
+    // - With newer Graph API versions (v22+), some legacy metrics like `impressions`
+    //   are no longer supported for media insights.
+    // - We only request metrics that are documented as supported for IG Media Insights.
+    //   See: https://developers.facebook.com/docs/instagram-api/reference/ig-media/insights
+    const params = new URLSearchParams({
+      metric: 'total_interactions,likes,comments,saved,shares',
+      access_token: this.config.instagramAccessToken,
+    });
+
+    const response = await fetch(`${url}?${params.toString()}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+      throw new Error(`Instagram Insights API error: ${error.error?.message || JSON.stringify(error)}`);
+    }
+
+    return response.json();
   }
 
   private mapMediaType(type: InstagramMediaType): string {

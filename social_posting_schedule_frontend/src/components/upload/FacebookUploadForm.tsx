@@ -1,7 +1,7 @@
 
-import React, { FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { uploadFacebookPost, CreateFacebookPostPayload, getFacebookPostById, repostFacebookPost } from '../../services/facebook';
+import { uploadFacebookPost, type CreateFacebookPostPayload, getFacebookPostById, repostFacebookPost } from '../../services/facebook';
 
 export default function FacebookUploadForm() {
   const navigate = useNavigate();
@@ -79,74 +79,74 @@ export default function FacebookUploadForm() {
           <div className="text-center text-gray-500 py-8">Loading post data...</div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-              rows={4}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your post content..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Media Type</label>
-            <select
-              value={mediaType}
-              onChange={(e) => setMediaType(e.target.value as 'TEXT' | 'PHOTO' | 'VIDEO')}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="TEXT">Text Only</option>
-              <option value="PHOTO">Photo</option>
-              <option value="VIDEO">Video</option>
-            </select>
-          </div>
-
-          {mediaType !== 'TEXT' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Media URL</label>
-              <input
-                type="url"
-                value={mediaUrl}
-                onChange={(e) => setMediaUrl(e.target.value)}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 required
+                rows={4}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://..."
+                placeholder="Enter your post content..."
               />
             </div>
-          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Schedule (optional)</label>
-            <input
-              type="datetime-local"
-              value={scheduledAt}
-              onChange={(e) => setScheduledAt(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Media Type</label>
+              <select
+                value={mediaType}
+                onChange={(e) => setMediaType(e.target.value as 'TEXT' | 'PHOTO' | 'VIDEO')}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="TEXT">Text Only</option>
+                <option value="PHOTO">Photo</option>
+                <option value="VIDEO">Video</option>
+              </select>
+            </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+            {mediaType !== 'TEXT' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Media URL</label>
+                <input
+                  type="url"
+                  value={mediaUrl}
+                  onChange={(e) => setMediaUrl(e.target.value)}
+                  required
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://..."
+                />
+              </div>
+            )}
 
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={isSubmitting || !content}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isSubmitting ? 'Publishing...' : id ? 'Republish' : 'Upload'}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Schedule (optional)</label>
+              <input
+                type="datetime-local"
+                value={scheduledAt}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {error && <p className="text-sm text-red-600">{error}</p>}
+
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={isSubmitting || !content}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isSubmitting ? 'Publishing...' : id ? 'Republish' : 'Upload'}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         )}
       </div>
     </div>
