@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getGroups, type Group } from '../services/groups';
+import PlatformInsights from './PlatformInsights';
 
 export default function Homepage() {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -93,6 +94,11 @@ export default function Homepage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Platform Insights Section */}
+        <div className="px-4 sm:px-0 mt-8">
+          <PlatformInsights />
         </div>
       </div>
     </div>

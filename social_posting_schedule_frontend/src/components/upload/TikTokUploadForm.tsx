@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { uploadTikTokPost, type CreateTikTokPostPayload, getTikTokPostById, repostTikTokPost } from '../../services/tiktok';
+import { showToast } from '../../utils/toast';
 
 export default function TikTokUploadForm() {
   const navigate = useNavigate();
@@ -57,8 +58,10 @@ export default function TikTokUploadForm() {
 
       if (id) {
         await repostTikTokPost(id, payload);
+        showToast.success('TikTok video republished successfully!');
       } else {
         await uploadTikTokPost(payload);
+        showToast.success('TikTok video uploaded successfully!');
       }
       navigate('/');
     } catch (err) {

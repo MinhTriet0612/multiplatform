@@ -3,13 +3,15 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateFacebookPostDto, FacebookMediaType } from '../dto/create-facebook-post.dto';
 import { FacebookPublisher } from '../platforms/facebook.publisher';
 import { FacebookPostStatus } from '@prisma/client';
+import { SocialPlatformConfig } from '../config/social-platform.config';
 
 @Injectable()
 export class FacebookService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly facebookPublisher: FacebookPublisher,
-  ) {}
+    private readonly config: SocialPlatformConfig,
+  ) { }
 
   async upload(userId: string, dto: CreateFacebookPostDto) {
     const mediaType = dto.mediaType || this.detectMediaType(dto.mediaUrl);
@@ -128,6 +130,40 @@ export class FacebookService {
     return this.prisma.facebookPost.findFirst({
       where: { id, userId },
     });
+  }
+
+  async getInsights(id: string, userId: string) {
+    const post = await this.prisma.facebookPost.findFirst({
+      where: { id, userId },
+    });
+
+    if (!post || !post.externalId) {
+      return null;
+    }
+
+    const url = `${this.config.facebookGraphUrl}/${post.externalId}/insights`;
+    // Note:
+    // - Meta deprecated a number of Page/Post metrics (including post_engaged_users).
+    // - We now stick to metrics that are still valid and available on Page posts:
+    //   * post_reactions_by_type_total  -> tổng reaction theo từng loại (giống likes/emoji breakdown)
+    //   * post_clicks_by_type          -> tổng clicks theo loại (giống engagement breakdown)
+    // Reference: https://developers.facebook.com/docs/graph-api/reference/v24.0/insights
+    const params = new URLSearchParams({
+      metric: 'post_reactions_by_type_total,post_clicks_by_type',
+      access_token: this.config.facebookAccessToken,
+    });
+
+    const response = await fetch(`${url}?${params.toString()}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+      throw new Error(`Facebook Insights API error: ${error.error?.message || JSON.stringify(error)}`);
+    }
+
+    return response.json();
   }
 
   private detectMediaType(mediaUrl?: string): FacebookMediaType {

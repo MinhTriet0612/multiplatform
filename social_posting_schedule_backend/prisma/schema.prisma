@@ -14,17 +14,17 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid())
-  email         String          @unique
-  password      String
-  name          String?
-  role          UserRole         @default(USER)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  groups        Group[]
-  facebookPosts FacebookPost[]
+  id             String          @id @default(cuid())
+  email          String          @unique
+  password       String
+  name           String?
+  role           UserRole        @default(USER)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  groups         Group[]
+  facebookPosts  FacebookPost[]
   instagramPosts InstagramPost[]
-  tiktokPosts   TikTokPost[]
+  tiktokPosts    TikTokPost[]
 
   @@map("users")
 }
@@ -36,37 +36,37 @@ enum UserRole {
 
 // Groups (Campaigns)
 model Group {
-  id            String          @id @default(cuid())
-  name          String
-  userId        String
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  facebookPosts FacebookPost[]
+  id        String   @id @default(cuid())
+  name      String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  facebookPosts  FacebookPost[]
   instagramPosts InstagramPost[]
-  tiktokPosts   TikTokPost[]
+  tiktokPosts    TikTokPost[]
 
   @@map("groups")
 }
 
 // Facebook Posts
 model FacebookPost {
-  id              String            @id @default(cuid())
+  id              String             @id @default(cuid())
   userId          String
   groupId         String?
   content         String
   mediaUrl        String?
-  mediaType       FacebookMediaType @default(TEXT)
+  mediaType       FacebookMediaType  @default(TEXT)
   status          FacebookPostStatus @default(QUEUED)
   externalId      String?
   scheduledAt     DateTime?
   publishedAt     DateTime?
   responseMessage String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   group Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   @@map("facebook_posts")
@@ -87,22 +87,22 @@ enum FacebookPostStatus {
 
 // Instagram Posts
 model InstagramPost {
-  id              String             @id @default(cuid())
+  id              String              @id @default(cuid())
   userId          String
   groupId         String?
   content         String
-  mediaUrls       String[]           // Array of media URLs for carousel support
-  mediaType       InstagramMediaType @default(IMAGE)
+  mediaUrls       String[] // Array of media URLs for carousel support
+  mediaType       InstagramMediaType  @default(IMAGE)
   status          InstagramPostStatus @default(QUEUED)
   externalId      String?
-  containerId     String?            // Instagram container ID
+  containerId     String? // Instagram container ID
   scheduledAt     DateTime?
   publishedAt     DateTime?
   responseMessage String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   group Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   @@map("instagram_posts")
@@ -125,7 +125,7 @@ enum InstagramPostStatus {
 
 // TikTok Posts
 model TikTokPost {
-  id              String          @id @default(cuid())
+  id              String           @id @default(cuid())
   userId          String
   groupId         String?
   content         String
@@ -133,14 +133,14 @@ model TikTokPost {
   title           String?
   status          TikTokPostStatus @default(QUEUED)
   externalId      String?
-  uploadId        String?         // TikTok upload ID
+  uploadId        String? // TikTok upload ID
   scheduledAt     DateTime?
   publishedAt     DateTime?
   responseMessage String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   group Group? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   @@map("tiktok_posts")

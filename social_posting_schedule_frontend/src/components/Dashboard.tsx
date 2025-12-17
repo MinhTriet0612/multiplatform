@@ -27,7 +27,7 @@ export default function Dashboard() {
                 onClick={handleLogout}
                 className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
               >
-                Đăng xuất
+                Logout
               </button>
             </div>
           </div>
@@ -38,10 +38,10 @@ export default function Dashboard() {
         <div className="px-4 sm:px-0">
           <div className="rounded-lg bg-indigo-50 p-6">
             <h2 className="text-xl font-semibold text-indigo-900 mb-2">
-              Chào mừng, {user?.name || user?.email}!
+              Welcome, {user?.name || user?.email}!
             </h2>
             <p className="text-indigo-700 text-sm">
-              Tạo bài viết một lần để chia sẻ tới Facebook, Instagram và Tiktok cùng lúc.
+              Create content once and share to Facebook, Instagram, and TikTok simultaneously.
             </p>
           </div>
         </div>

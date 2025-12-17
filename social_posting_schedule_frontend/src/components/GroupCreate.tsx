@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGroup } from '../services/groups';
+import { showToast } from '../utils/toast';
 
 export default function GroupCreate() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function GroupCreate() {
 
     try {
       const response = await createGroup({ name });
+      showToast.success('Campaign created successfully!');
       navigate(`/groups/${response.data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create campaign');

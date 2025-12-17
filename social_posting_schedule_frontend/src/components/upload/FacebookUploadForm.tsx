@@ -2,6 +2,7 @@
 import { type FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { uploadFacebookPost, type CreateFacebookPostPayload, getFacebookPostById, repostFacebookPost } from '../../services/facebook';
+import { showToast } from '../../utils/toast';
 
 export default function FacebookUploadForm() {
   const navigate = useNavigate();
@@ -58,8 +59,10 @@ export default function FacebookUploadForm() {
 
       if (id) {
         await repostFacebookPost(id, payload);
+        showToast.success('Facebook post republished successfully!');
       } else {
         await uploadFacebookPost(payload);
+        showToast.success('Facebook post uploaded successfully!');
       }
       navigate('/');
     } catch (err) {

@@ -84,5 +84,17 @@ export class FacebookController {
     }
     return this.facebookService.findOne(id, req.user.userId);
   }
+
+  @Get(':id/insights')
+  @ApiOperation({
+    summary: 'Get insights for a Facebook post',
+    description: 'Fetch Facebook Insights metrics for a specific post from Facebook Graph API.',
+  })
+  async getInsights(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    if (!req.user?.userId) {
+      throw new UnauthorizedException('Missing user context');
+    }
+    return this.facebookService.getInsights(id, req.user.userId);
+  }
 }
 

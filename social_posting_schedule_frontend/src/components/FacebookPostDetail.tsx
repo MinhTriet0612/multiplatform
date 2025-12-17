@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
-  getInstagramPostById,
-  getInstagramPostInsights,
-  type InstagramPost,
-  type InstagramInsightsResponse,
-} from '../services/instagram';
+  getFacebookPostById,
+  getFacebookPostInsights,
+  type FacebookPost,
+  type FacebookInsightsResponse,
+} from '../services/facebook';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { Box } from '@mui/material';
 
-export default function InstagramPostDetail() {
+export default function FacebookPostDetail() {
   const { id } = useParams<{ id: string }>();
-  const [post, setPost] = useState<InstagramPost | null>(null);
-  const [insights, setInsights] = useState<InstagramInsightsResponse | null>(null);
+  const [post, setPost] = useState<FacebookPost | null>(null);
+  const [insights, setInsights] = useState<FacebookInsightsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,13 +23,13 @@ export default function InstagramPostDetail() {
       setError(null);
       try {
         const [postRes, insightsRes] = await Promise.all([
-          getInstagramPostById(id),
-          getInstagramPostInsights(id),
+          getFacebookPostById(id),
+          getFacebookPostInsights(id),
         ]);
         setPost(postRes.data);
         setInsights(insightsRes.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load post insights');
+        setError(err instanceof Error ? err.message : 'Failed to load Facebook insights');
       } finally {
         setLoading(false);
       }
@@ -49,7 +49,7 @@ export default function InstagramPostDetail() {
     return (
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="bg-white shadow rounded-lg p-8 text-center text-gray-500">
-          Loading post data & insights...
+          Loading Facebook post & insights...
         </div>
       </div>
     );
@@ -60,7 +60,7 @@ export default function InstagramPostDetail() {
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="bg-white shadow rounded-lg p-8 text-center">
           <p className="text-red-600 mb-4">
-            {error || 'Instagram post not found.'}
+            {error || 'Facebook post not found.'}
           </p>
           <Link
             to="/"
@@ -75,15 +75,22 @@ export default function InstagramPostDetail() {
 
   const metrics = insights?.data || [];
   const labels = metrics.map((m) => m.title || m.name);
-  const values = metrics.map((m) => (m.values[0]?.value as number) || 0);
+  const values = metrics.map((m) => {
+    const v = m.values[0]?.value;
+    if (typeof v === 'number') return v;
+    if (v && typeof v === 'object') {
+      return Object.values(v).reduce((sum, n) => sum + (typeof n === 'number' ? n : 0), 0);
+    }
+    return 0;
+  });
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 space-y-6">
       <div className="px-4 sm:px-0 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Instagram Post Detail</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Facebook Post Detail</h1>
           <p className="text-sm text-gray-500">
-            Displaying post data and Instagram Insights from Facebook Graph API.
+            Displaying post data and Facebook Insights from Graph API.
           </p>
         </div>
         <Link
@@ -111,23 +118,28 @@ export default function InstagramPostDetail() {
               Published at: {new Date(post.publishedAt).toLocaleString()}
             </p>
           )}
-          {post.mediaUrls && post.mediaUrls.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {post.mediaUrls.map((url) => (
-                <img
-                  key={url}
-                  src={url}
-                  alt="Instagram media"
-                  className="w-24 h-24 object-cover rounded-md border"
+          {post.mediaUrl && (
+            <div className="mt-3">
+              {post.mediaType === 'VIDEO' ? (
+                <video
+                  src={post.mediaUrl}
+                  controls
+                  className="w-full max-w-md rounded-md border"
                 />
-              ))}
+              ) : (
+                <img
+                  src={post.mediaUrl}
+                  alt="Facebook media"
+                  className="w-48 h-48 object-cover rounded-md border"
+                />
+              )}
             </div>
           )}
         </div>
 
         <div className="bg-white shadow rounded-lg p-4">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">
-            Instagram Insights
+            Facebook Insights
           </h2>
           {!metrics.length ? (
             <p className="text-sm text-gray-500">

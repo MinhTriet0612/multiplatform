@@ -1,6 +1,7 @@
 import React, { type FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { uploadInstagramPost, type CreateInstagramPostPayload, getInstagramPostById, repostInstagramPost } from '../../services/instagram';
+import { showToast } from '../../utils/toast';
 
 export default function InstagramUploadForm() {
   const navigate = useNavigate();
@@ -64,8 +65,10 @@ export default function InstagramUploadForm() {
 
       if (id) {
         await repostInstagramPost(id, payload);
+        showToast.success('Instagram post republished successfully!');
       } else {
         await uploadInstagramPost(payload);
+        showToast.success('Instagram post uploaded successfully!');
       }
       navigate('/');
     } catch (err) {

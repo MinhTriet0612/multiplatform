@@ -1,5 +1,6 @@
 import { type FormEvent, useMemo, useState } from 'react';
 import { type Platform, uploadUnifiedPost } from '../services/posts';
+import { showToast } from '../utils/toast';
 
 const PLATFORM_LABELS: Record<Platform, string> = {
   FACEBOOK: 'Facebook',
@@ -43,6 +44,7 @@ export default function PostComposer() {
       setContent('');
       setMediaUrl('');
       setScheduledAt('');
+      showToast.success('Post uploaded successfully!');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload post');
     } finally {
@@ -55,24 +57,24 @@ export default function PostComposer() {
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-900">Upload once, share everywhere</h3>
         <p className="text-sm text-gray-500">
-          Soạn nội dung và chọn nền tảng để gửi ngay hoặc lên lịch.
+          Create content and select platforms to post immediately or schedule.
         </p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nội dung</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             required
             rows={4}
             className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Thông điệp bạn muốn đăng..."
+            placeholder="Enter your post message..."
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Media URL (tùy chọn)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Media URL (optional)</label>
           <input
             type="url"
             value={mediaUrl}
@@ -83,7 +85,7 @@ export default function PostComposer() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Lịch đăng (tùy chọn)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Schedule (optional)</label>
           <input
             type="datetime-local"
             value={scheduledAt}
@@ -93,7 +95,7 @@ export default function PostComposer() {
         </div>
 
         <div>
-          <span className="block text-sm font-medium text-gray-700 mb-2">Nền tảng</span>
+          <span className="block text-sm font-medium text-gray-700 mb-2">Platforms</span>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {(Object.keys(PLATFORM_LABELS) as Platform[]).map((platform) => (
               <label
@@ -120,7 +122,7 @@ export default function PostComposer() {
         {error && <p className="text-sm text-red-600">{error}</p>}
         {result && result.platforms && (
           <div className="rounded-md border border-gray-200 p-3">
-            <p className="text-sm font-medium text-gray-700 mb-2">Kết quả:</p>
+            <p className="text-sm font-medium text-gray-700 mb-2">Results:</p>
             <ul className="space-y-1 text-sm text-gray-600">
               {result.platforms.map((platform: any) => (
                 <li key={platform.id} className="flex justify-between">
@@ -147,7 +149,7 @@ export default function PostComposer() {
           disabled={isSubmitting || !content || !selectedPlatforms.length}
           className="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50"
         >
-          {isSubmitting ? 'Đang đăng...' : 'Đăng lên tất cả'}
+          {isSubmitting ? 'Publishing...' : 'Post to All Platforms'}
         </button>
       </form>
     </div>

@@ -53,8 +53,12 @@ export default function GroupDetail() {
     navigate(`${base}?groupId=${group.id}`);
   };
 
-  const handleViewInsights = (postId: string) => {
+  const handleViewInstagramInsights = (postId: string) => {
     navigate(`/instagram-posts/${postId}`);
+  };
+
+  const handleViewFacebookInsights = (postId: string) => {
+    navigate(`/facebook-posts/${postId}`);
   };
 
   if (!id) {
@@ -151,13 +155,20 @@ export default function GroupDetail() {
                     Status: {post.status} •{' '}
                     {new Date(post.createdAt).toLocaleString()}
                   </p>
-                  <div className="mt-2">
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={() => handleReusePost('facebook', post.id)}
                       className="text-xs font-medium text-blue-600 hover:text-blue-700"
                     >
                       {post.status === 'FAILED' ? 'Repost' : 'Update & Repost'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleViewFacebookInsights(post.id)}
+                      className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+                    >
+                      View Details & Insights
                     </button>
                   </div>
                 </li>
@@ -193,7 +204,7 @@ export default function GroupDetail() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleViewInsights(post.id)}
+                      onClick={() => handleViewInstagramInsights(post.id)}
                       className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
                     >
                       View Details & Insights
